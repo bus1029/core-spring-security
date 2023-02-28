@@ -32,7 +32,7 @@ class SecurityUserConfig {
       return User.builder()
                 .username("manager")
                 .password(passwordEncoder().encode("manager1111"))
-                .roles("MANAGER")
+                .roles("USER", "MANAGER")
                 .build()
     }
 
@@ -40,7 +40,7 @@ class SecurityUserConfig {
         return User.builder()
                 .username("admin")
                 .password(passwordEncoder().encode("admin1111"))
-                .roles("ADMIN")
+                .roles("USER", "MANAGER", "ADMIN")
                 .build()
     }
 
