@@ -19,7 +19,7 @@ class SecurityConfig {
   @Bean
   fun filterChain(http: HttpSecurity): SecurityFilterChain {
     http.authorizeRequests()
-      .antMatchers("/").permitAll()
+      .antMatchers("/", "/users").permitAll()
       .antMatchers("/mypage").hasRole("USER")
       .antMatchers("/messages").hasRole("MANAGER")
       .antMatchers("/config").hasRole("ADMIN")
