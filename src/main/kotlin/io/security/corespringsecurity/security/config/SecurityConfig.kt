@@ -1,4 +1,4 @@
-package io.security.corespringsecurity.config
+package io.security.corespringsecurity.security.config
 
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication
 import org.springframework.boot.autoconfigure.security.ConditionalOnDefaultWebSecurity
