@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.security.web.authentication.WebAuthenticationDetails
 import javax.servlet.http.HttpServletRequest
 
@@ -19,31 +20,39 @@ import javax.servlet.http.HttpServletRequest
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @EnableWebSecurity
 class SecurityConfig(
-  private val authenticationDetailsSource: AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails>
+  private val authenticationDetailsSource: AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails>,
+  private val customSuccessHandler: AuthenticationSuccessHandler
 ) {
   @Bean
   fun filterChain(http: HttpSecurity): SecurityFilterChain {
+    setAuthorizationAndAuthentication(http)
+    setFormLogin(http)
+    return http.build()
+  }
+
+  fun setAuthorizationAndAuthentication(http: HttpSecurity) {
     http.authorizeRequests()
       .antMatchers("/", "/users").permitAll()
       .antMatchers("/mypage").hasRole("USER")
       .antMatchers("/messages").hasRole("MANAGER")
       .antMatchers("/config").hasRole("ADMIN")
       .anyRequest().authenticated()
-      .and()
-      .formLogin()
+  }
+
+  fun setFormLogin(http: HttpSecurity) {
+    http.formLogin()
       .loginPage("/login")
       .loginProcessingUrl("/login_proc")
       .authenticationDetailsSource(authenticationDetailsSource)
       .defaultSuccessUrl("/")
+      .successHandler(customSuccessHandler)
       .permitAll()
-
-    return http.build()
   }
 
-//  @Bean
-//  fun webSecurityCustomizer(): WebSecurityCustomizer {
-//    return WebSecurityCustomizer { web: WebSecurity ->
-//      web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations())
-//    }
-//  }
+  @Bean
+  fun webSecurityCustomizer(): WebSecurityCustomizer {
+    return WebSecurityCustomizer { web: WebSecurity ->
+      web.ignoring().requestMatchers(PathRequest.toStaticResources().atCommonLocations())
+    }
+  }
 }
