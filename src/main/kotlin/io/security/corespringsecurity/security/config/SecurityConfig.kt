@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.AuthenticationFailureHandler
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.security.web.authentication.WebAuthenticationDetails
@@ -23,12 +24,15 @@ import javax.servlet.http.HttpServletRequest
 class SecurityConfig(
   private val authenticationDetailsSource: AuthenticationDetailsSource<HttpServletRequest, WebAuthenticationDetails>,
   private val customSuccessHandler: AuthenticationSuccessHandler,
-  private val customFailureHandler: AuthenticationFailureHandler
+  private val customFailureHandler: AuthenticationFailureHandler,
+  private val customAccessDeniedHandler: AccessDeniedHandler
 ) {
   @Bean
   fun filterChain(http: HttpSecurity): SecurityFilterChain {
     setAuthorizationAndAuthentication(http)
     setFormLogin(http)
+    setExceptionHandling(http)
+
     return http.build()
   }
 
@@ -50,6 +54,11 @@ class SecurityConfig(
       .successHandler(customSuccessHandler)
       .failureHandler(customFailureHandler)
       .permitAll()
+  }
+
+  private fun setExceptionHandling(http: HttpSecurity) {
+    http.exceptionHandling()
+      .accessDeniedHandler(customAccessDeniedHandler)
   }
 
   @Bean
