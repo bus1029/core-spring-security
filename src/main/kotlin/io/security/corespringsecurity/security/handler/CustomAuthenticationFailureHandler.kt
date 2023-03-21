@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
-@Component
+@Component("customFailureHandler")
 class CustomAuthenticationFailureHandler() : SimpleUrlAuthenticationFailureHandler() {
   override fun onAuthenticationFailure(
     request: HttpServletRequest?,

@@ -1,6 +1,8 @@
 package io.security.corespringsecurity.security.config
 
+import io.security.corespringsecurity.security.common.AjaxLoginAuthenticationEntryPoint
 import io.security.corespringsecurity.security.filter.AjaxLoginProcessingFilter
+import io.security.corespringsecurity.security.handler.AjaxAccessDeniedHandler
 import io.security.corespringsecurity.security.handler.AjaxAuthenticationFailureHandler
 import io.security.corespringsecurity.security.handler.AjaxAuthenticationSuccessHandler
 import io.security.corespringsecurity.security.provider.AjaxAuthenticationProvider
@@ -32,6 +34,7 @@ class AjaxSecurityConfig(
   fun filterChain(http: HttpSecurity): SecurityFilterChain {
     setAuthorizeAndAuthentication(http)
     setAjaxLoginFilter(http)
+    setExceptionHandling(http)
     return http.build()
   }
 
@@ -39,6 +42,7 @@ class AjaxSecurityConfig(
     http
       .antMatcher("/api/**")
       .authorizeRequests()
+      .antMatchers("/api/messages").hasRole("MANAGER")
       .anyRequest().authenticated()
   }
 
@@ -64,22 +68,26 @@ class AjaxSecurityConfig(
       .userDetailsService(userDetailsService)
       .passwordEncoder(passwordEncoder)
       .and()
-      .authenticationProvider(ajaxAuthenticationProvider())
+      .authenticationProvider(authenticationProvider())
       .build()
   }
 
   @Bean
-  fun ajaxAuthenticationProvider(): AuthenticationProvider {
-    return AjaxAuthenticationProvider(userDetailsService, passwordEncoder)
+  fun authenticationProvider() = ajaxAuthenticationProvider()
+
+  private fun setExceptionHandling(http: HttpSecurity) {
+    http.exceptionHandling()
+      .authenticationEntryPoint(AjaxLoginAuthenticationEntryPoint())
+      .accessDeniedHandler(AjaxAccessDeniedHandler())
   }
 
   @Bean
-  fun ajaxAuthenticationSuccessHandler(): AjaxAuthenticationSuccessHandler {
-    return AjaxAuthenticationSuccessHandler()
-  }
+  fun ajaxAuthenticationProvider() =
+    AjaxAuthenticationProvider(userDetailsService, passwordEncoder)
 
-  @Bean
-  fun ajaxAuthenticationFailureHandler(): AjaxAuthenticationFailureHandler {
-    return AjaxAuthenticationFailureHandler()
-  }
+  @Bean("ajaxSuccessHandler")
+  fun ajaxAuthenticationSuccessHandler() = AjaxAuthenticationSuccessHandler()
+
+  @Bean("ajaxFailureHandler")
+  fun ajaxAuthenticationFailureHandler() = AjaxAuthenticationFailureHandler()
 }
