@@ -1,9 +1,10 @@
 package io.security.corespringsecurity.domain.dto
 
-data class AccountDto(
-  var username: String,
-  var password: String,
-  var email: String,
-  var age: String,
-  var role: String
+class AccountDto(
+  var id: String? = null,
+  var username: String = "",
+  var password: String = "",
+  var email: String = "",
+  var age: Int = 0,
+  var roles: List<String>? = null
 )

@@ -38,7 +38,7 @@ class SecurityConfig(
 
   fun setAuthorizationAndAuthentication(http: HttpSecurity) {
     http.authorizeRequests()
-      .antMatchers("/", "/users", "user/login/**", "/login*").permitAll()
+      .antMatchers("/**").permitAll()
       .antMatchers("/mypage").hasRole("USER")
       .antMatchers("/messages").hasRole("MANAGER")
       .antMatchers("/config").hasRole("ADMIN")

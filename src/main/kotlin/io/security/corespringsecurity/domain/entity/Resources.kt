@@ -26,5 +26,5 @@ class Resources(
   @JoinTable(name = "role_resources",
     joinColumns = [JoinColumn(name = "resource_id")],
     inverseJoinColumns = [JoinColumn(name = "role_id")])
-  var roleSet: Set<Role> = HashSet()
+  var roleSet: Set<Role>? = HashSet()
 }

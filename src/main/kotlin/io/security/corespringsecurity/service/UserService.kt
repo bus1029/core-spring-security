@@ -8,5 +8,5 @@ interface UserService {
   fun modifyUser(accountDto: AccountDto)
   fun getUsers(): List<Account>
   fun getUser(id: Long): AccountDto
-  fun deleteUser(idx: Long)
+  fun deleteUser(id: Long)
 }

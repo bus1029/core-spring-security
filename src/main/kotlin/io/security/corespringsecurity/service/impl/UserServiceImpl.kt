@@ -6,6 +6,7 @@ import io.security.corespringsecurity.domain.entity.Role
 import io.security.corespringsecurity.repository.RoleRepository
 import io.security.corespringsecurity.repository.UserRepository
 import io.security.corespringsecurity.service.UserService
+import org.modelmapper.ModelMapper
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -29,7 +30,22 @@ class UserServiceImpl(
   }
 
   override fun modifyUser(accountDto: AccountDto) {
-    TODO("Not yet implemented")
+    val modelMapper = ModelMapper()
+    val account = modelMapper.map(accountDto, Account::class.java)
+
+    accountDto.roles?.let {
+      val roles = HashSet<Role>()
+      it.forEach { role ->
+        val r = roleRepository.findByRoleName(role)
+        if (r != null) {
+          roles.add(r)
+        }
+      }
+      account.userRoles = roles
+    }
+
+    account.password = passwordEncoder.encode(accountDto.password)
+    userRepository.save(account)
   }
 
   override fun getUsers(): List<Account> {
@@ -37,10 +53,19 @@ class UserServiceImpl(
   }
 
   override fun getUser(id: Long): AccountDto {
-    TODO("Not yet implemented")
+    val account = userRepository.findById(id).orElse(Account())
+    val modelMapper = ModelMapper()
+    val accountDto = modelMapper.map(account, AccountDto::class.java)
+
+    val roles = account.userRoles
+      .map { role -> role.roleName }
+      .toList()
+
+    accountDto.roles = roles
+    return accountDto
   }
 
-  override fun deleteUser(idx: Long) {
-    TODO("Not yet implemented")
+  override fun deleteUser(id: Long) {
+    userRepository.deleteById(id)
   }
 }
